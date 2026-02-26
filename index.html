@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Argos V21.5 - Master Edition</title>
+    <title>Argos V21.6 - Master Control</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -13,9 +13,9 @@
         .glass { background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.05); }
         .tab-active { border-bottom: 2px solid #3b82f6; color: white; }
         input[type="number"] { background: #000; border: 1px solid #334155; color: #fbbf24; padding: 2px; border-radius: 4px; width: 50px; font-size: 10px; text-align: center; }
-        .btn-active:active { transform: scale(0.92); filter: brightness(1.2); }
+        .btn-cycle:active { transform: scale(0.90); filter: brightness(1.2); }
+        .pulse-admin { animation: pulse-emerald 2s infinite; }
         @keyframes pulse-emerald { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
-        .pulse-btn { animation: pulse-emerald 2s infinite; }
     </style>
 </head>
 <body>
@@ -25,7 +25,7 @@
             <i data-lucide="shield-check" class="mx-auto text-blue-500 mb-6 w-12 h-12"></i>
             <h1 class="text-3xl font-black italic mb-2 tracking-tighter uppercase text-white">ARGOS <span class="text-blue-500">V21</span></h1>
             <input id="input-username" type="text" class="w-full bg-black/50 border border-slate-700 p-4 rounded-2xl mb-4 text-center text-white outline-none uppercase font-bold" placeholder="ID GOBERNADOR">
-            <button onclick="login()" class="w-full bg-blue-600 py-4 rounded-2xl font-black uppercase text-white shadow-lg transition-transform active:scale-95">Entrar</button>
+            <button onclick="login()" class="w-full bg-blue-600 py-4 rounded-2xl font-black uppercase text-white shadow-lg transition-transform active:scale-95">Entrar al Sistema</button>
         </div>
     </div>
 
@@ -41,7 +41,7 @@
             <div class="glass p-4 rounded-2xl border-l-4 border-blue-300 text-center text-[10px]">A: <span id="stat-algodon" class="font-black text-sm block">0</span></div>
             <div class="glass p-4 rounded-2xl border-l-4 border-amber-500 text-center text-[10px]">G: <span id="stat-granos" class="font-black text-sm block">0</span></div>
             <div class="glass p-4 rounded-2xl border-l-4 border-purple-500 text-center">
-                <p class="text-[8px] font-mono text-slate-500 uppercase">Ciclos</p>
+                <p class="text-[8px] font-mono text-slate-500 uppercase">Ciclo País</p>
                 <p id="stat-ciclos" class="text-lg font-black text-purple-400">0</p>
             </div>
         </header>
@@ -49,36 +49,29 @@
         <nav class="flex gap-6 mb-6 border-b border-white/5 pb-2 overflow-x-auto items-center">
             <button onclick="changeTab('ciudad')" id="btn-ciudad" class="text-[10px] font-bold uppercase pb-2 tab-active">Ciudad</button>
             <button onclick="changeTab('mercado')" id="btn-mercado" class="text-[10px] font-bold uppercase pb-2 text-slate-500">Mercado</button>
-            <button onclick="changeTab('ranking')" id="btn-ranking" class="text-[10px] font-bold uppercase pb-2 text-slate-500">Ranking</button>
+            <button onclick="changeTab('ranking')" id="btn-ranking" class="text-[10px] font-bold uppercase pb-2 text-slate-500">Global</button>
             <button id="btn-admin" onclick="changeTab('config')" class="hidden text-[10px] font-bold uppercase pb-2 text-red-500">Config Admin</button>
             
             <div class="ml-auto flex items-center gap-4">
-                <span id="display-user" class="text-[10px] font-mono text-blue-500 uppercase font-bold hidden md:block"></span>
-                <button onclick="avanzarCiclo()" class="btn-active pulse-btn bg-emerald-600 hover:bg-emerald-500 px-8 py-3 rounded-2xl text-[11px] font-black uppercase italic text-white transition-all shadow-lg">
-                    + CICLO
+                <button id="btn-avanzar-ciclo" onclick="intentarAvanzarCiclo()" class="btn-cycle bg-emerald-600 hover:bg-emerald-500 px-8 py-3 rounded-2xl text-[11px] font-black uppercase italic text-white shadow-lg transition-all">
+                    + PASAR CICLO
                 </button>
             </div>
         </nav>
 
         <div id="view-ciudad">
             <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
-                <h3 class="text-xs font-black uppercase text-slate-400">Construcción y Urbanismo</h3>
+                <h3 class="text-xs font-black uppercase text-slate-400 italic">Plan Maestro de Urbanismo</h3>
                 <select id="select-obra" class="bg-slate-800 text-[10px] p-3 rounded-xl text-white outline-none uppercase font-bold border border-white/10">
-                    <optgroup label="Residencial">
-                        <option value="residencial">🏘️ Zona Residencial</option>
-                    </optgroup>
-                    <optgroup label="Industrias">
-                        <option value="ind_metal">⚒️ Industria Metal</option>
-                        <option value="ind_madera">🪵 Industria Madera</option>
-                        <option value="ind_algodon">👕 Industria Algodón</option>
-                        <option value="ind_granos">🌾 Industria Granos</option>
-                    </optgroup>
-                    <optgroup label="Servicios">
-                        <option value="salud">🏥 Salud (Hospital)</option>
-                        <option value="seguridad">👮 Seguridad (Comisaría)</option>
-                        <option value="educacion">🎓 Educación (Escuela)</option>
-                    </optgroup>
-                    <option value="vacio">🗑️ Demoler / Vaciar</option>
+                    <option value="residencial">🏘️ Zona Residencial</option>
+                    <option value="ind_metal">⚒️ Industria Metalúrgica</option>
+                    <option value="ind_madera">🪵 Aserradero Madera</option>
+                    <option value="ind_algodon">👕 Planta de Algodón</option>
+                    <option value="ind_granos">🌾 Campo de Granos</option>
+                    <option value="salud">🏥 Centro de Salud</option>
+                    <option value="seguridad">👮 Comisaría Central</option>
+                    <option value="educacion">🎓 Escuela Pública</option>
+                    <option value="vacio">🗑️ Demoler Terreno</option>
                 </select>
             </div>
             <div id="grid-mapa" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4"></div>
@@ -86,36 +79,202 @@
 
         <div id="view-mercado" class="hidden">
             <div class="max-w-2xl mx-auto glass p-8 rounded-[2.5rem]">
-                <h2 class="text-xl font-black italic mb-6 text-center text-white">CENTRAL DE COMERCIO</h2>
+                <h2 class="text-xl font-black italic mb-6 text-center text-white">CENTRAL DE EXPORTACIONES</h2>
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <button onclick="vender('hierro')" class="flex justify-between items-center p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors border border-white/5">
-                        <span class="text-xs font-bold uppercase">Vender Hierro (x100)</span>
-                        <span class="text-emerald-400 font-mono">+1.000 TK</span>
+                    <button onclick="vender('hierro')" class="flex justify-between items-center p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-all border border-white/5">
+                        <span class="text-[10px] font-bold uppercase">Vender Hierro (x100)</span><span class="text-emerald-400 font-mono">+1.000 TK</span>
                     </button>
-                    <button onclick="vender('madera')" class="flex justify-between items-center p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors border border-white/5">
-                        <span class="text-xs font-bold uppercase">Vender Madera (x100)</span>
-                        <span class="text-emerald-400 font-mono">+1.000 TK</span>
+                    <button onclick="vender('madera')" class="flex justify-between items-center p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-all border border-white/5">
+                        <span class="text-[10px] font-bold uppercase">Vender Madera (x100)</span><span class="text-emerald-400 font-mono">+1.000 TK</span>
                     </button>
-                    <button onclick="vender('algodon')" class="flex justify-between items-center p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors border border-white/5">
-                        <span class="text-xs font-bold uppercase">Vender Algodón (x100)</span>
-                        <span class="text-emerald-400 font-mono">+1.000 TK</span>
+                    <button onclick="vender('algodon')" class="flex justify-between items-center p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-all border border-white/5">
+                        <span class="text-[10px] font-bold uppercase">Vender Algodón (x100)</span><span class="text-emerald-400 font-mono">+1.000 TK</span>
                     </button>
-                    <button onclick="vender('granos')" class="flex justify-between items-center p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-colors border border-white/5">
-                        <span class="text-xs font-bold uppercase">Vender Granos (x100)</span>
-                        <span class="text-emerald-400 font-mono">+1.000 TK</span>
+                    <button onclick="vender('granos')" class="flex justify-between items-center p-4 bg-white/5 rounded-2xl hover:bg-white/10 transition-all border border-white/5">
+                        <span class="text-[10px] font-bold uppercase">Vender Granos (x100)</span><span class="text-emerald-400 font-mono">+1.000 TK</span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <div id="view-ranking" class="hidden">
-            <div id="ranking-container" class="space-y-2 max-w-xl mx-auto"></div>
-        </div>
+        <div id="view-ranking" class="hidden"><div id="ranking-container" class="space-y-2 max-w-xl mx-auto"></div></div>
 
         <div id="view-config" class="hidden">
             <div class="glass p-6 rounded-3xl overflow-x-auto">
-                <h2 class="font-black italic mb-4 uppercase text-red-500">Editor Maestro de Parámetros</h2>
+                <h2 class="font-black italic mb-4 uppercase text-red-500">Consola de Administración</h2>
                 <table class="w-full text-[9px] text-left">
                     <thead class="text-slate-500 border-b border-white/10 uppercase">
-                        <tr>
-                            <th class="p-2">Ed
+                        <tr><th class="p-2">Edificio</th><th class="p-2">Costo (TK)</th><th class="p-2">Prod</th><th class="p-2">Pop</th><th class="p-2">Consumo</th></tr>
+                    </thead>
+                    <tbody id="config-table-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyA4APdfVXN36nhBv-DHBvQF6NdxhR62S8M",
+            authDomain: "todosyyo-20671.firebaseapp.com",
+            databaseURL: "https://todosyyo-20671-default-rtdb.firebaseio.com",
+            projectId: "todosyyo-20671",
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        let user = "";
+        let currentTab = 'ciudad';
+        let EXCEL = {
+            residencial: { costo: 2500, prod: 0, pop: 50, consumo: 10 },
+            ind_metal: { costo: 1200, prod: 20, pop: 0, consumo: 50 },
+            ind_madera: { costo: 1200, prod: 20, pop: 0, consumo: 50 },
+            ind_algodon: { costo: 1200, prod: 20, pop: 0, consumo: 50 },
+            ind_granos: { costo: 1200, prod: 20, pop: 0, consumo: 50 },
+            salud: { costo: 40000, prod: 0, pop: 0, consumo: 200 },
+            seguridad: { costo: 40000, prod: 0, pop: 0, consumo: 200 },
+            educacion: { costo: 40000, prod: 0, pop: 0, consumo: 200 }
+        };
+
+        let game = {
+            tokens: 50000, poblacion: 0, recursos: { hierro: 500, madera: 500, algodon: 500, granos: 500 },
+            manzanas: Array(12).fill({ tipo: 'vacio', nivel: 0 })
+        };
+
+        const ICONOS = {
+            vacio: 'square', residencial: 'home', ind_metal: 'anvil', ind_madera: 'tree-pine',
+            ind_algodon: 'shirt', ind_granos: 'wheat', salud: 'heart-pulse', seguridad: 'shield', educacion: 'graduation-cap'
+        };
+
+        function login() {
+            const input = document.getElementById('input-username');
+            user = input.value.trim().toUpperCase();
+            if(!user) return;
+
+            if(user === "AGUS") {
+                document.getElementById('btn-admin').classList.remove('hidden');
+                document.getElementById('btn-avanzar-ciclo').classList.add('pulse-admin');
+            }
+
+            db.ref('argos_world/ciudades/' + user).once('value', (snap) => {
+                if(snap.exists()) game = { ...game, ...snap.val() };
+                else db.ref('argos_world/ciudades/' + user).set(game);
+                
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('main-ui').classList.remove('hidden');
+                
+                initWorldSync();
+                renderConfigTable();
+                render();
+            });
+        }
+
+        function initWorldSync() {
+            // Escuchar Ciclos Globales
+            db.ref('argos_world/metadata/cicloActual').on('value', snap => {
+                document.getElementById('stat-ciclos').innerText = snap.val() || 0;
+            });
+
+            // Escuchar Ranking
+            db.ref('argos_world/ciudades').on('value', snap => {
+                const container = document.getElementById('ranking-container');
+                container.innerHTML = `<h3 class="text-center font-black italic mb-4">ESTADO DEL PAÍS</h3>`;
+                const data = snap.val();
+                Object.values(data).sort((a,b)=>b.tokens - a.tokens).forEach((c, i) => {
+                    container.innerHTML += `<div class="flex justify-between p-3 bg-white/5 rounded-xl text-[10px]"><span><b>#${i+1}</b> ${c.nombre}</span><span class="text-emerald-400 font-mono">${Math.floor(c.tokens).toLocaleString()} TK</span></div>`;
+                });
+            });
+        }
+
+        function intentarAvanzarCiclo() {
+            if(user !== "AGUS") {
+                alert("⛔ ACCESO DENEGADO: Solo el usuario Admin (Agus) puede autorizar el avance del ciclo.");
+                return;
+            }
+            avanzarCiclo();
+        }
+
+        function avanzarCiclo() {
+            let totalPop = 0; let totalConsumo = 0;
+            game.manzanas.forEach(m => {
+                if(m.tipo === 'vacio') return;
+                const config = EXCEL[m.tipo];
+                totalConsumo += config.consumo;
+                if(m.tipo === 'residencial') totalPop += (m.nivel * config.pop);
+                if(m.tipo === 'ind_metal') game.recursos.hierro += (m.nivel * config.prod);
+                if(m.tipo === 'ind_madera') game.recursos.madera += (m.nivel * config.prod);
+                if(m.tipo === 'ind_algodon') game.recursos.algodon += (m.nivel * config.prod);
+                if(m.tipo === 'ind_granos') game.recursos.granos += (m.nivel * config.prod);
+            });
+            game.poblacion = totalPop;
+            game.tokens += (totalPop * 1) - totalConsumo;
+
+            // Incrementar Ciclo Global
+            db.ref('argos_world/metadata/cicloActual').transaction(curr => (curr || 0) + 1);
+            
+            save(); render();
+        }
+
+        function vender(r) {
+            if(game.recursos[r] < 100) return alert("Stock insuficiente");
+            game.recursos[r] -= 100;
+            game.tokens += 1000;
+            save(); render();
+        }
+
+        function construir(idx) {
+            const tipo = document.getElementById('select-obra').value;
+            if(tipo === 'vacio') { game.manzanas[idx] = { tipo: 'vacio', nivel: 0 }; } 
+            else {
+                const costo = EXCEL[tipo].costo;
+                if(game.tokens < costo) return alert("Faltan Tokens");
+                game.tokens -= costo;
+                game.manzanas[idx] = { tipo: tipo, nivel: 1 };
+            }
+            save(); render();
+        }
+
+        function changeTab(tab) {
+            document.getElementById('view-' + currentTab).classList.add('hidden');
+            document.getElementById('btn-' + currentTab).classList.remove('tab-active');
+            currentTab = tab;
+            document.getElementById('view-' + tab).classList.remove('hidden');
+            document.getElementById('btn-' + tab).classList.add('tab-active');
+        }
+
+        function renderConfigTable() {
+            const body = document.getElementById('config-table-body');
+            body.innerHTML = "";
+            Object.keys(EXCEL).forEach(key => {
+                body.innerHTML += `<tr class="border-b border-white/5"><td class="p-2 font-bold uppercase text-blue-400">${key}</td>
+                    <td class="p-2"><input type="number" value="${EXCEL[key].costo}" onchange="EXCEL['${key}'].costo=parseInt(this.value)"></td>
+                    <td class="p-2"><input type="number" value="${EXCEL[key].prod}" onchange="EXCEL['${key}'].prod=parseInt(this.value)"></td>
+                    <td class="p-2"><input type="number" value="${EXCEL[key].pop}" onchange="EXCEL['${key}'].pop=parseInt(this.value)"></td>
+                    <td class="p-2"><input type="number" value="${EXCEL[key].consumo}" onchange="EXCEL['${key}'].consumo=parseInt(this.value)"></td></tr>`;
+            });
+        }
+
+        function save() { db.ref('argos_world/ciudades/' + user).update(game); }
+
+        function render() {
+            document.getElementById('stat-tokens').innerText = Math.floor(game.tokens).toLocaleString();
+            document.getElementById('stat-hierro').innerText = game.recursos.hierro;
+            document.getElementById('stat-madera').innerText = game.recursos.madera;
+            document.getElementById('stat-algodon').innerText = game.recursos.algodon;
+            document.getElementById('stat-granos').innerText = game.recursos.granos;
+
+            const grid = document.getElementById('grid-mapa');
+            grid.innerHTML = "";
+            game.manzanas.forEach((m, i) => {
+                const div = document.createElement('div');
+                div.className = `glass p-4 rounded-3xl border flex flex-col items-center justify-center min-h-[140px] ${m.tipo === 'vacio' ? 'border-dashed border-slate-800' : 'border-blue-500/20'}`;
+                div.innerHTML = `<i data-lucide="${ICONOS[m.tipo]}" class="mb-2 ${m.tipo === 'vacio' ? 'text-slate-800' : 'text-blue-500'}"></i>
+                    <p class="text-[8px] font-black uppercase">${m.tipo}</p>
+                    ${m.tipo === 'vacio' ? `<button onclick="construir(${i})" class="mt-2 text-[8px] bg-white/5 px-4 py-1 rounded-full font-black">OBRAR</button>` : 
+                    `<span class="text-[10px] text-blue-400 font-bold italic mt-2">NV ${m.nivel}</span>`} `;
+                grid.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+    </script>
+</body>
+</html>
