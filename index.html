@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Argos V33.2 - Fix Config</title>
+    <title>ARGOS V33.2 - INTEGRADO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -22,15 +22,13 @@
 
     <div id="login-screen" class="min-h-screen flex items-center justify-center p-6 bg-black">
         <div class="glass p-10 rounded-[3rem] text-center max-w-md w-full border border-white/5">
-            <i data-lucide="shield-check" class="mx-auto text-blue-500 mb-6 w-16 h-16"></i>
-            <h1 class="text-4xl font-black italic mb-2 text-white uppercase italic">ARGOS <span class="text-blue-500">V33.2</span></h1>
-            <p class="text-[10px] font-mono text-slate-500 mb-10 tracking-[0.4em]">ADMIN: AGUS</p>
-            <input id="input-username" type="text" class="w-full bg-black border border-slate-700 p-5 rounded-2xl mb-6 text-center text-white text-xl outline-none uppercase font-bold focus:border-blue-500" placeholder="NOMBRE">
-            <button onclick="login()" class="w-full bg-blue-600 hover:bg-blue-500 py-5 rounded-2xl font-black uppercase text-white shadow-xl">Entrar</button>
+            <h1 class="text-4xl font-black italic mb-10 text-white">ARGOS <span class="text-blue-500">V33.2</span></h1>
+            <input id="input-username" type="text" class="w-full bg-black border border-slate-700 p-5 rounded-2xl mb-6 text-center text-white text-xl uppercase font-bold" placeholder="USUARIO">
+            <button onclick="login()" class="w-full bg-blue-600 py-5 rounded-2xl font-black uppercase text-white shadow-xl">ENTRAR</button>
         </div>
     </div>
 
-    <div id="main-ui" class="hidden p-4 md:p-8 max-w-[1600px] mx-auto">
+    <div id="main-ui" class="hidden p-8 max-w-[1600px] mx-auto">
         <header class="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
             <div class="glass p-4 rounded-3xl border-l-4 border-yellow-500 text-center"><p class="text-[9px] font-bold text-slate-500 uppercase">Tokens</p><p id="stat-tokens" class="text-xl font-black text-yellow-500 font-mono">0</p></div>
             <div class="glass p-4 rounded-3xl border-l-4 border-slate-400 text-center"><p class="text-[9px] font-bold text-slate-500 uppercase">Hierro</p><p id="stat-hierro" class="text-xl font-black text-slate-200 font-mono">0</p></div>
@@ -41,89 +39,50 @@
         </header>
 
         <nav class="flex gap-6 mb-8 border-b border-white/5 pb-2 overflow-x-auto">
-            <button onclick="changeTab('ciudad')" id="btn-ciudad" class="nav-link text-xs font-black uppercase tab-active whitespace-nowrap">🏢 Ciudad</button>
-            <button onclick="changeTab('mercado')" id="btn-mercado" class="nav-link text-xs font-black uppercase text-slate-500 whitespace-nowrap">⚖️ Mercado</button>
-            <button onclick="changeTab('ranking')" id="btn-ranking" class="nav-link text-xs font-black uppercase text-slate-500 whitespace-nowrap">🏆 Ranking</button>
-            <button id="btn-admin" onclick="changeTab('config')" class="nav-link hidden text-xs font-black uppercase text-red-500 whitespace-nowrap">⚙️ Config</button>
-            <div class="ml-auto">
-                <button id="btn-sync" onclick="intentarAvanzarCiclo()" class="bg-emerald-600 hover:bg-emerald-500 px-4 py-2 rounded-xl text-[10px] font-black uppercase text-white hidden">Sync Ciclo</button>
-            </div>
+            <button onclick="changeTab('ciudad')" id="btn-ciudad" class="nav-link text-xs font-black uppercase tab-active whitespace-nowrap">🏢 CIUDAD</button>
+            <button onclick="changeTab('mercado')" id="btn-mercado" class="nav-link text-xs font-black uppercase text-slate-500 whitespace-nowrap">⚖️ MERCADO</button>
+            <button onclick="changeTab('ranking')" id="btn-ranking" class="nav-link text-xs font-black uppercase text-slate-500 whitespace-nowrap">🏆 RANKING</button>
+            <button id="btn-admin" onclick="changeTab('config')" class="nav-link hidden text-xs font-black uppercase text-red-500 whitespace-nowrap">⚙️ CONFIG</button>
+            <button id="btn-sync" onclick="intentarAvanzarCiclo()" class="ml-auto bg-emerald-600 px-4 py-2 rounded-xl text-[10px] font-black uppercase text-white hidden">SYNC CICLO</button>
         </nav>
 
         <section id="view-ciudad" class="tab-content">
-            <div class="flex justify-between items-center mb-6 bg-white/5 p-4 rounded-2xl border border-white/5">
-                <select id="select-obra" class="bg-black text-[10px] p-2 rounded-xl text-white border border-slate-700 font-black uppercase w-full max-w-xs"></select>
-            </div>
-            <div id="grid-mapa" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"></div>
+            <select id="select-obra" class="bg-black text-[10px] p-2 rounded-xl text-white border border-slate-700 font-black uppercase mb-6 w-full max-w-xs"></select>
+            <div id="grid-mapa" class="grid grid-cols-1 md:grid-cols-4 gap-6"></div>
         </section>
 
-        <section id="view-config" class="tab-content hidden space-y-8 pb-20">
-            <div class="flex justify-between items-center bg-red-950/20 p-6 rounded-3xl border border-red-500/20">
-                <h2 class="text-xl font-black text-red-500 uppercase italic">Ajustes Maestros</h2>
-                <button onclick="aplicarConfig()" class="bg-red-600 px-8 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg">Aplicar Cambios</button>
-            </div>
-            <div class="grid lg:grid-cols-2 gap-8">
-                <div class="glass p-6 rounded-3xl overflow-x-auto">
-                    <h3 class="text-[11px] font-black uppercase mb-4 text-blue-400">💰 Costos y Habitantes</h3>
-                    <table class="w-full text-left text-[11px]"><tbody id="config-body-1"></tbody></table>
-                </div>
-                <div class="glass p-6 rounded-3xl overflow-x-auto">
-                    <h3 class="text-[11px] font-black uppercase mb-4 text-emerald-400">🏗️ Materiales</h3>
-                    <table class="w-full text-left text-[11px]"><tbody id="config-body-2"></tbody></table>
-                </div>
-            </div>
-        </section>
-
-        <section id="view-mercado" class="tab-content hidden">
-            <div class="glass p-10 rounded-[3rem] max-w-xl mx-auto text-center border border-emerald-500/20">
-                <h2 class="text-xl font-black mb-8 uppercase text-emerald-500">Puerto de Exportación</h2>
-                <div id="mercado-list" class="grid gap-3"></div>
-            </div>
+        <section id="view-mercado" class="tab-content hidden glass p-10 rounded-[3rem] max-w-xl border border-emerald-500/20">
+            <h2 class="text-xl font-black mb-8 uppercase text-emerald-500">Puerto de Exportación</h2>
+            <div id="mercado-list" class="grid gap-3"></div>
         </section>
 
         <section id="view-ranking" class="tab-content hidden">
             <div id="ranking-container" class="max-w-3xl mx-auto space-y-3"></div>
         </section>
+
+        <section id="view-config" class="tab-content hidden space-y-8">
+            <button onclick="aplicarConfig()" class="bg-red-600 px-8 py-3 rounded-xl font-black text-[10px] uppercase shadow-lg">Aplicar Cambios</button>
+            <div class="grid lg:grid-cols-2 gap-8">
+                <div class="glass p-6 rounded-3xl"><table class="w-full text-left" id="config-body-1"></table></div>
+                <div class="glass p-6 rounded-3xl"><table class="w-full text-left" id="config-body-2"></table></div>
+            </div>
+        </section>
     </div>
 
     <script>
+        // CONFIG
         const firebaseConfig = { apiKey: "AIzaSyA4APdfVXN36nhBv-DHBvQF6NdxhR62S8M", authDomain: "todosyyo-20671.firebaseapp.com", databaseURL: "https://todosyyo-20671-default-rtdb.firebaseio.com", projectId: "todosyyo-20671" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
-
-        let user = "";
-        let game = { tokens: 50000, poblacion: 0, recursos: { hierro: 500, madera: 500, algodon: 500, granos: 500 }, manzanas: Array(12).fill({ tipo: 'vacio', nivel: 0 }) };
+        let user = "", game = { tokens: 50000, poblacion: 0, recursos: { hierro: 500, madera: 500, algodon: 500, granos: 500 }, manzanas: Array(12).fill({ tipo: 'vacio', nivel: 0 }) };
         
-        let EXCEL = {
-            residencial: { costo: 2500, prod: 0, pop: 100, m_h: 300, m_m: 300 },
-            ind_metal: { costo: 100, prod: 20, pop: 10, m_h: 150, m_m: 0 },
-            ind_madera: { costo: 100, prod: 20, pop: 10, m_h: 0, m_m: 150 },
-            ind_algodon: { costo: 100, prod: 20, pop: 10, m_h: 150, m_m: 150 },
-            ind_granos: { costo: 100, prod: 20, pop: 10, m_h: 150, m_m: 150 },
-            salud: { costo: 4500, prod: 0, pop: 150, m_h: 150, m_m: 150 },
-            seguridad: { costo: 9000, prod: 0, pop: 300, m_h: 300, m_m: 300 },
-            educacion: { costo: 200000, prod: 0, pop: 200, m_h: 1000, m_m: 1000 }
-        };
-
-        const EVOLUCION = {
-            residencial: { n: ["Carpa", "Casa", "Edificio", "Rascacielos"], i: ["home"] },
-            ind_metal: { n: ["Mina", "Forja", "Fundición", "Acería"], i: ["pickaxe"] },
-            ind_madera: { n: ["Cabaña", "Aserradero", "Carpintería", "Maderera"], i: ["tree-pine"] },
-            ind_algodon: { n: ["Campo", "Tejeduría", "Textilería", "Moda"], i: ["shirt"] },
-            ind_granos: { n: ["Huerta", "Granja", "Silo", "Agroindustria"], i: ["wheat"] },
-            salud: { n: ["Posta", "Clínica", "Hospital", "Centro Médico"], i: ["heart-pulse"] },
-            seguridad: { n: ["Garita", "Comisaría", "Cuartel", "Ministerio"], i: ["shield"] },
-            educacion: { n: ["Aula", "Escuela", "Colegio", "Universidad"], i: ["book"] },
-            vacio: { n: ["Terreno"], i: ["plus"] }
-        };
+        let EXCEL = { residencial: {costo: 2500, prod: 0, pop: 100, m_h: 300, m_m: 300}, ind_metal: {costo: 100, prod: 20, pop: 10, m_h: 150, m_m: 0}, ind_madera: {costo: 100, prod: 20, pop: 10, m_h: 0, m_m: 150}, ind_algodon: {costo: 100, prod: 20, pop: 10, m_h: 150, m_m: 150}, ind_granos: {costo: 100, prod: 20, pop: 10, m_h: 150, m_m: 150}, salud: {costo: 4500, prod: 0, pop: 150, m_h: 150, m_m: 150}, seguridad: {costo: 9000, prod: 0, pop: 300, m_h: 300, m_m: 300}, educacion: {costo: 200000, prod: 0, pop: 200, m_h: 1000, m_m: 1000} };
+        const EVOLUCION = { residencial: {n: ["Carpa", "Casa", "Edificio", "Rascacielos"], i: ["home"]}, ind_metal: {n: ["Mina", "Forja", "Fundición", "Acería"], i: ["pickaxe"]}, ind_madera: {n: ["Cabaña", "Aserradero", "Carpintería", "Maderera"], i: ["tree-pine"]}, ind_algodon: {n: ["Campo", "Tejeduría", "Textilería", "Moda"], i: ["shirt"]}, ind_granos: {n: ["Huerta", "Granja", "Silo", "Agroindustria"], i: ["wheat"]}, salud: {n: ["Posta", "Clínica", "Hospital", "Centro Médico"], i: ["heart-pulse"]}, seguridad: {n: ["Garita", "Comisaría", "Cuartel", "Ministerio"], i: ["shield"]}, educacion: {n: ["Aula", "Escuela", "Colegio", "Universidad"], i: ["book"]}, vacio: {n: ["Terreno"], i: ["plus"]} };
 
         function login() {
             user = document.getElementById('input-username').value.trim().toUpperCase();
             if(!user) return;
-            if(user === "AGUS") { 
-                document.getElementById('btn-admin').classList.remove('hidden'); 
-                document.getElementById('btn-sync').classList.remove('hidden'); 
-            }
+            if(user === "AGUS") { document.getElementById('btn-admin').classList.remove('hidden'); document.getElementById('btn-sync').classList.remove('hidden'); }
             db.ref('argos_world/ciudades/' + user).on('value', snap => {
                 if(snap.exists()) { game = { ...game, ...snap.val() }; }
                 document.getElementById('login-screen').classList.add('hidden');
@@ -133,45 +92,12 @@
             db.ref('argos_world/metadata/cicloActual').on('value', s => document.getElementById('stat-ciclos').innerText = s.val() || 0);
         }
 
-        function initSelect() {
-            const sel = document.getElementById('select-obra');
-            sel.innerHTML = `<option value="vacio">DEMOLER / VACÍO</option>`;
-            Object.keys(EXCEL).forEach(key => { sel.innerHTML += `<option value="${key}">${key.toUpperCase()}</option>`; });
-        }
-
-        function changeTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-            document.querySelectorAll('.nav-link').forEach(el => { el.classList.remove('tab-active', 'text-white'); el.classList.add('text-slate-500'); });
-            document.getElementById('view-' + tabId).classList.remove('hidden');
-            document.getElementById('btn-' + tabId).classList.add('tab-active', 'text-white');
-            if(tabId === 'config') renderConfigTables();
-        }
-
-        function renderConfigTables() {
-            const b1 = document.getElementById('config-body-1');
-            const b2 = document.getElementById('config-body-2');
-            b1.innerHTML = "<tr><th>Edificio</th><th>Costo</th><th>Pop</th></tr>"; 
-            b2.innerHTML = "<tr><th>Edificio</th><th>Hierro</th><th>Madera</th></tr>";
-            Object.keys(EXCEL).forEach(key => {
-                const d = EXCEL[key];
-                b1.innerHTML += `<tr><td class="p-1 text-blue-400 font-bold uppercase">${key}</td>
-                    <td><input type="number" id="c-${key}" value="${d.costo}"></td>
-                    <td><input type="number" id="p-${key}" value="${d.pop}"></td></tr>`;
-                b2.innerHTML += `<tr><td class="p-1 text-emerald-400 font-bold uppercase">${key}</td>
-                    <td><input type="number" id="mh-${key}" value="${d.m_h}"></td>
-                    <td><input type="number" id="mm-${key}" value="${d.m_m}"></td></tr>`;
-            });
-        }
-
-        function aplicarConfig() {
-            Object.keys(EXCEL).forEach(key => {
-                EXCEL[key].costo = parseInt(document.getElementById(`c-${key}`).value);
-                EXCEL[key].pop = parseInt(document.getElementById(`p-${key}`).value);
-                EXCEL[key].m_h = parseInt(document.getElementById(`mh-${key}`).value);
-                EXCEL[key].m_m = parseInt(document.getElementById(`mm-${key}`).value);
-            });
-            alert("CONFIGURACIÓN APLICADA");
-            changeTab('ciudad');
+        function changeTab(id) {
+            document.querySelectorAll('.tab-content').forEach(e => e.classList.add('hidden'));
+            document.querySelectorAll('.nav-link').forEach(e => { e.classList.remove('tab-active', 'text-white'); e.classList.add('text-slate-500'); });
+            document.getElementById('view-' + id).classList.remove('hidden');
+            document.getElementById('btn-' + id).classList.add('tab-active', 'text-white');
+            if(id === 'config') renderConfigTables();
         }
 
         function render() {
@@ -183,9 +109,8 @@
             const grid = document.getElementById('grid-mapa'); grid.innerHTML = "";
             game.manzanas.forEach((m, i) => {
                 const evo = EVOLUCION[m.tipo] || EVOLUCION.vacio;
-                const idx = Math.min(m.nivel > 0 ? m.nivel - 1 : 0, evo.n.length - 1);
                 const div = document.createElement('div');
-                div.className = `glass p-6 rounded-[2rem] border-2 flex flex-col items-center justify-center min-h-[180px] relative ${m.tipo === 'vacio' ? 'border-dashed border-slate-800' : 'border-blue-500/20'}`;
+                div.className = `glass p-6 rounded-[2rem] border-2 flex flex-col items-center justify-center relative ${m.tipo === 'vacio' ? 'border-dashed border-slate-800' : 'border-blue-500/20'}`;
                 div.innerHTML = `<span class="parcela-num">#${i+1}</span>${m.tipo !== 'vacio' ? `<span class="lvl-tag">NVL ${m.nivel}</span>` : ''}
                     <i data-lucide="${evo.i[0] || 'plus'}" class="mb-3 ${m.tipo === 'vacio' ? 'text-slate-800' : 'text-blue-500'} w-10 h-10"></i>
                     <p class="text-[12px] font-black uppercase text-white">${m.tipo === 'vacio' ? 'Terreno' : m.tipo}</p>
@@ -195,61 +120,15 @@
             lucide.createIcons();
         }
 
-        function construir(idx) {
-            const tipo = document.getElementById('select-obra').value;
-            if(tipo === 'vacio') return;
-            const c = EXCEL[tipo];
-            if(game.tokens < c.costo || game.recursos.hierro < c.m_h || game.recursos.madera < c.m_m) return alert("FALTAN RECURSOS");
-            game.tokens -= c.costo; game.recursos.hierro -= c.m_h; game.recursos.madera -= c.m_m;
-            game.manzanas[idx] = { tipo: tipo, nivel: 1 };
-            save();
-        }
-
-        function upgrade(idx) {
-            const m = game.manzanas[idx];
-            const costo = m.nivel * EXCEL[m.tipo].costo;
-            if(game.tokens < costo) return alert("FALTAN TOKENS");
-            game.tokens -= costo; m.nivel++;
-            save();
-        }
-
-        function renderMercado() {
-            const list = document.getElementById('mercado-list'); list.innerHTML = "";
-            ['hierro', 'madera', 'algodon', 'granos'].forEach(r => {
-                list.innerHTML += `<button onclick="vender('${r}')" class="flex justify-between p-4 bg-white/5 rounded-2xl border border-white/10 font-black uppercase text-[10px]"><span>Exportar ${r}</span><span class="text-emerald-400">+1.000 TK</span></button>`;
-            });
-        }
-
-        function vender(r) { if(game.recursos[r] >= 100) { game.recursos[r] -= 100; game.tokens += 1000; save(); render(); } }
-
-        function renderRanking() {
-            db.ref('argos_world/ciudades').once('value', snap => {
-                const container = document.getElementById('ranking-container'); container.innerHTML = "";
-                const data = snap.val() || {};
-                Object.keys(data).sort((a,b)=>data[b].tokens - data[a].tokens).forEach((key, i) => {
-                    container.innerHTML += `<div class="glass p-4 rounded-2xl flex justify-between items-center"><span class="font-black text-blue-500">#${i+1}</span><div class="text-left"><p class="font-black uppercase text-[12px]">${key}</p><p class="text-[9px] text-slate-500">POB: ${data[key].poblacion || 0}</p></div><span class="font-black text-emerald-400 font-mono">${Math.floor(data[key].tokens).toLocaleString()}</span></div>`;
-                });
-            });
-        }
-
-        function intentarAvanzarCiclo() {
-            let totalPop = 0;
-            game.manzanas.forEach(m => {
-                if(m.tipo !== 'vacio') {
-                    totalPop += (m.nivel * EXCEL[m.tipo].pop);
-                    if(m.tipo.includes('ind')) {
-                        const res = m.tipo.split('_')[1] === 'metal' ? 'hierro' : m.tipo.split('_')[1];
-                        game.recursos[res] = (game.recursos[res] || 0) + (m.nivel * EXCEL[m.tipo].prod);
-                    }
-                }
-            });
-            game.poblacion = totalPop;
-            game.tokens += totalPop;
-            db.ref('argos_world/metadata/cicloActual').transaction(c => (c || 0) + 1);
-            save();
-            alert("Ciclo Sincronizado");
-        }
-
+        function initSelect() { const sel = document.getElementById('select-obra'); sel.innerHTML = `<option value="vacio">DEMOLER / VACÍO</option>`; Object.keys(EXCEL).forEach(k => { sel.innerHTML += `<option value="${k}">${k.toUpperCase()}</option>`; }); }
+        function renderConfigTables() { const b1 = document.getElementById('config-body-1'), b2 = document.getElementById('config-body-2'); b1.innerHTML = "<tr><th>Edificio</th><th>Costo</th><th>Pop</th></tr>"; b2.innerHTML = "<tr><th>Edificio</th><th>Hierro</th><th>Madera</th></tr>"; Object.keys(EXCEL).forEach(key => { const d = EXCEL[key]; b1.innerHTML += `<tr><td class="p-1 text-blue-400 font-bold uppercase">${key}</td><td><input type="number" id="c-${key}" value="${d.costo}"></td><td><input type="number" id="p-${key}" value="${d.pop}"></td></tr>`; b2.innerHTML += `<tr><td class="p-1 text-emerald-400 font-bold uppercase">${key}</td><td><input type="number" id="mh-${key}" value="${d.m_h}"></td><td><input type="number" id="mm-${key}" value="${d.m_m}"></td></tr>`; }); }
+        function aplicarConfig() { Object.keys(EXCEL).forEach(key => { EXCEL[key].costo = parseInt(document.getElementById(`c-${key}`).value); EXCEL[key].pop = parseInt(document.getElementById(`p-${key}`).value); EXCEL[key].m_h = parseInt(document.getElementById(`mh-${key}`).value); EXCEL[key].m_m = parseInt(document.getElementById(`mm-${key}`).value); }); alert("CONFIGURACIÓN APLICADA"); changeTab('ciudad'); }
+        function construir(idx) { const tipo = document.getElementById('select-obra').value; if(tipo === 'vacio') return; const c = EXCEL[tipo]; if(game.tokens < c.costo || game.recursos.hierro < c.m_h || game.recursos.madera < c.m_m) return alert("FALTAN RECURSOS"); game.tokens -= c.costo; game.recursos.hierro -= c.m_h; game.recursos.madera -= c.m_m; game.manzanas[idx] = { tipo: tipo, nivel: 1 }; save(); }
+        function upgrade(idx) { const m = game.manzanas[idx]; const costo = m.nivel * EXCEL[m.tipo].costo; if(game.tokens < costo) return alert("FALTAN TOKENS"); game.tokens -= costo; m.nivel++; save(); }
+        function renderMercado() { const list = document.getElementById('mercado-list'); list.innerHTML = ""; ['hierro', 'madera', 'algodon', 'granos'].forEach(r => { list.innerHTML += `<button onclick="vender('${r}')" class="flex justify-between p-4 bg-white/5 rounded-2xl border border-white/10 font-black uppercase text-[10px]"><span>Exportar ${r}</span><span class="text-emerald-400">+1.000 TK</span></button>`; }); }
+        function vender(r) { if(game.recursos[r] >= 100) { game.recursos[r] -= 100; game.tokens += 1000; save(); } }
+        function renderRanking() { db.ref('argos_world/ciudades').once('value', s => { const container = document.getElementById('ranking-container'); container.innerHTML = ""; const data = s.val() || {}; Object.keys(data).sort((a,b)=>data[b].tokens - data[a].tokens).forEach((key, i) => { container.innerHTML += `<div class="glass p-4 rounded-2xl flex justify-between items-center"><span class="font-black text-blue-500">#${i+1}</span><div class="text-left"><p class="font-black uppercase text-[12px]">${key}</p><p class="text-[9px] text-slate-500">POB: ${data[key].poblacion || 0}</p></div><span class="font-black text-emerald-400 font-mono">${Math.floor(data[key].tokens).toLocaleString()}</span></div>`; }); }); }
+        function intentarAvanzarCiclo() { let totalPop = 0; game.manzanas.forEach(m => { if(m.tipo !== 'vacio') { totalPop += (m.nivel * EXCEL[m.tipo].pop); if(m.tipo.includes('ind')) { const res = m.tipo.split('_')[1] === 'metal' ? 'hierro' : m.tipo.split('_')[1]; game.recursos[res] = (game.recursos[res] || 0) + (m.nivel * EXCEL[m.tipo].prod); } } }); game.poblacion = totalPop; game.tokens += totalPop; db.ref('argos_world/metadata/cicloActual').transaction(c => (c || 0) + 1); save(); alert("Ciclo Sincronizado"); }
         function save() { db.ref('argos_world/ciudades/' + user).update(game); render(); }
     </script>
 </body>
