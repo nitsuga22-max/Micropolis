@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ARGOS V33.2 - INTEGRADO</title>
+    <title>ARGOS V33.2 - COMPLETO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -12,10 +12,9 @@
         body { background-color: #020205; color: #e2e8f0; font-family: 'Inter', sans-serif; }
         .glass { background: rgba(15, 23, 42, 0.7); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,0.08); }
         .tab-active { border-bottom: 3px solid #3b82f6 !important; color: white !important; font-weight: 900; }
-        input[type="number"] { background: #000; border: 1px solid #334155; color: #fbbf24; padding: 4px; border-radius: 6px; width: 75px; text-align: center; font-size: 11px; font-weight: bold; }
-        .nav-link { transition: all 0.2s; border-bottom: 3px solid transparent; padding-bottom: 8px; cursor: pointer; }
+        .nav-link { cursor: pointer; transition: 0.2s; border-bottom: 3px solid transparent; padding-bottom: 8px; }
         .parcela-num { position: absolute; top: 12px; left: 15px; font-size: 10px; font-weight: 900; color: rgba(255,255,255,0.2); }
-        .lvl-tag { position: absolute; top: 12px; right: 15px; font-size: 10px; font-weight: 900; background: #1e3a8a; padding: 2px 8px; border-radius: 8px; color: #60a5fa; }
+        .lvl-tag { position: absolute; top: 12px; right: 15px; font-size: 10px; font-weight: 900; padding: 2px 8px; border-radius: 8px; }
     </style>
 </head>
 <body class="min-h-screen">
@@ -70,7 +69,6 @@
     </div>
 
     <script>
-        // CONFIG
         const firebaseConfig = { apiKey: "AIzaSyA4APdfVXN36nhBv-DHBvQF6NdxhR62S8M", authDomain: "todosyyo-20671.firebaseapp.com", databaseURL: "https://todosyyo-20671-default-rtdb.firebaseio.com", projectId: "todosyyo-20671" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
@@ -109,12 +107,13 @@
             const grid = document.getElementById('grid-mapa'); grid.innerHTML = "";
             game.manzanas.forEach((m, i) => {
                 const evo = EVOLUCION[m.tipo] || EVOLUCION.vacio;
+                let puedeUpgrade = m.tipo !== 'vacio' && game.tokens >= (m.nivel * EXCEL[m.tipo].costo);
                 const div = document.createElement('div');
-                div.className = `glass p-6 rounded-[2rem] border-2 flex flex-col items-center justify-center relative ${m.tipo === 'vacio' ? 'border-dashed border-slate-800' : 'border-blue-500/20'}`;
-                div.innerHTML = `<span class="parcela-num">#${i+1}</span>${m.tipo !== 'vacio' ? `<span class="lvl-tag">NVL ${m.nivel}</span>` : ''}
-                    <i data-lucide="${evo.i[0] || 'plus'}" class="mb-3 ${m.tipo === 'vacio' ? 'text-slate-800' : 'text-blue-500'} w-10 h-10"></i>
-                    <p class="text-[12px] font-black uppercase text-white">${m.tipo === 'vacio' ? 'Terreno' : m.tipo}</p>
-                    <button onclick="${m.tipo === 'vacio' ? `construir(${i})` : `upgrade(${i})`}" class="mt-4 bg-blue-600 px-4 py-2 rounded-xl text-[9px] font-black uppercase">${m.tipo === 'vacio' ? 'Construir' : 'Mejorar'}</button>`;
+                div.className = `glass p-6 rounded-[2rem] border-2 flex flex-col items-center justify-center relative transition-all duration-300 ${m.tipo === 'vacio' ? 'border-dashed border-slate-800' : (puedeUpgrade ? 'border-emerald-500 shadow-[0_0_15px_rgba(16,185,129,0.1)]' : 'border-blue-500/20')}`;
+                div.innerHTML = `<span class="parcela-num">#${i+1}</span>${m.tipo !== 'vacio' ? `<span class="lvl-tag ${puedeUpgrade ? 'bg-emerald-900 text-emerald-400' : 'bg-blue-900 text-blue-400'}">NVL ${m.nivel}</span>` : ''}
+                    <i data-lucide="${evo.i[0] || 'plus'}" class="mb-3 ${m.tipo === 'vacio' ? 'text-slate-800' : (puedeUpgrade ? 'text-emerald-400' : 'text-blue-500')} w-8 h-8"></i>
+                    <p class="text-[10px] font-black uppercase text-slate-400">${m.tipo === 'vacio' ? 'Terreno' : m.tipo}</p>
+                    <button onclick="${m.tipo === 'vacio' ? `construir(${i})` : `upgrade(${i})`}" class="mt-4 w-full ${puedeUpgrade ? 'bg-emerald-600' : 'bg-blue-600'} py-2 rounded-xl text-[9px] font-black uppercase transition-colors">${m.tipo === 'vacio' ? 'Construir' : 'Mejorar'}</button>`;
                 grid.appendChild(div);
             });
             lucide.createIcons();
