@@ -6,52 +6,49 @@
     <title>Micropolis - Gestión Urbana</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
-        :root { --primary: #3b82f6; --bg: #f8fafc; --text: #1e293b; }
-        body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg); color: var(--text); }
-        .page { display: none; width: 90%; max-width: 900px; margin: 20px auto; padding: 30px; background: white; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        body { font-family: sans-serif; background-color: #f0f2f5; margin: 0; }
+        .page { display: none; padding: 20px; }
         .active { display: block; }
+        nav { background: #1e293b; color: white; padding: 15px; display: flex; gap: 20px; justify-content: center; }
         
-        nav { background: #1e293b; color: white; padding: 15px; display: flex; justify-content: center; gap: 20px; position: sticky; top: 0; z-index: 100; }
-        nav button { background: transparent; border: none; color: #94a3b8; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 0.8rem; transition: 0.3s; }
-        nav button:hover, nav button.active-nav { color: white; }
-
-        .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: #f1f5f9; padding: 20px; border-radius: 12px; text-align: center; }
-        .stat-card p { margin: 10px 0 0; font-size: 1.5rem; font-weight: 700; color: var(--primary); }
-
-        .grid-parcelas { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
-        .parcela-card { border: 2px solid #e2e8f0; padding: 15px; border-radius: 12px; text-align: center; background: #fff; }
-        .btn-accion { margin-top: 10px; padding: 8px 16px; border: none; border-radius: 6px; background: var(--primary); color: white; cursor: pointer; }
+        /* Grid de Parcelas */
+        .grid-parcelas { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+            gap: 20px; 
+            margin-top: 20px; 
+            padding: 20px;
+        }
+        .parcela-card { 
+            background: white; 
+            border: 2px solid #3b82f6; 
+            padding: 15px; 
+            border-radius: 10px; 
+            text-align: center;
+        }
+        .btn { padding: 10px; cursor: pointer; background: #3b82f6; color: white; border: none; border-radius: 5px; }
     </style>
 </head>
 <body>
 
     <nav id="navbar" style="display: none;">
-        <button onclick="showPage('juego')" class="active-nav"><i data-lucide="city"></i> Ciudad</button>
-        <button onclick="showPage('dashboard')"><i data-lucide="pie-chart"></i> Dashboard</button>
-        <button onclick="showPage('mercado')"><i data-lucide="shopping-cart"></i> Mercado</button>
-        <button onclick="showPage('configuraciones')"><i data-lucide="settings"></i> Config</button>
+        <button onclick="showPage('juego')">Ciudad</button>
+        <button onclick="showPage('dashboard')">Dashboard</button>
     </nav>
 
-    <div id="login" class="page active" style="text-align: center;">
-        <i data-lucide="building-2" style="width: 64px; height: 64px; color: var(--primary);"></i>
+    <div id="login" class="page active">
         <h1>Micropolis</h1>
-        <button class="btn-accion" onclick="login()">Entrar al Juego</button>
+        <button class="btn" onclick="iniciarJuego()">Entrar</button>
     </div>
 
     <div id="juego" class="page">
-        <h2><i data-lucide="map"></i> Tu Ciudad</h2>
-        <div class="stats-container">
-            <div class="stat-card"><h3>Tokens</h3><p id="stat-tokens">1000</p></div>
-            <div class="stat-card"><h3>Parcelas</h3><p id="stat-parcelas">4</p></div>
-        </div>
-        <button onclick="comprarParcelas()" style="background: #10b981;" class="btn-accion">Comprar 2 Parcelas (50 Tokens)</button>
-        <div id="grid-parcelas" class="grid-parcelas"></div>
+        <h2>Tu Ciudad</h2>
+        <p>Tokens: <span id="stat-tokens">1000</span></p>
+        <button class="btn" onclick="comprarParcelas()">Comprar 2 Parcelas (50 Tokens)</button>
+        
+        <div id="grid-parcelas" class="grid-parcelas">
+            </div>
     </div>
-
-    <div id="dashboard" class="page"><h1>Dashboard</h1></div>
-    <div id="mercado" class="page"><h1>Mercado</h1></div>
-    <div id="configuraciones" class="page"><h1>Configuraciones</h1><button onclick="logout()" class="btn-accion" style="background: #ef4444;">Cerrar Sesión</button></div>
 
     <script>
         let jugador = {
@@ -64,50 +61,49 @@
             ]
         };
 
-        function renderParcelas() {
-            const container = document.getElementById('grid-parcelas');
-            container.innerHTML = '';
-            jugador.parcelas.forEach((p, index) => {
+        function renderizar() {
+            const grid = document.getElementById('grid-parcelas');
+            grid.innerHTML = ''; 
+            
+            jugador.parcelas.forEach((p, i) => {
                 const div = document.createElement('div');
                 div.className = 'parcela-card';
                 div.innerHTML = `
                     <i data-lucide="square"></i>
                     <p>${p.tipo}</p>
                     <small>Nivel: ${p.nivel}</small>
-                    <br>
-                    <button class="btn-accion" onclick="mejorarParcela(${index})">Upgrade</button>
                 `;
-                container.appendChild(div);
+                grid.appendChild(div);
             });
-            lucide.createIcons(); // Vital: esto renderiza los iconos
+            
+            document.getElementById('stat-tokens').innerText = jugador.tokens;
+            if (typeof lucide !== 'undefined') lucide.createIcons();
         }
 
         function comprarParcelas() {
-            if(jugador.tokens >= 50) {
+            if (jugador.tokens >= 50) {
                 jugador.tokens -= 50;
-                jugador.parcelas.push({id: jugador.parcelas.length + 1, tipo: 'Vacia', nivel: 0}, {id: jugador.parcelas.length + 2, tipo: 'Vacia', nivel: 0});
-                actualizarUI();
-            } else { alert("Tokens insuficientes"); }
+                jugador.parcelas.push({id: 5, tipo: 'Vacia', nivel: 0}, {id: 6, tipo: 'Vacia', nivel: 0});
+                renderizar();
+            } else {
+                alert("No tienes suficientes tokens");
+            }
         }
 
-        function mejorarParcela(index) {
-            jugador.parcelas[index].nivel++;
-            actualizarUI();
+        function iniciarJuego() {
+            document.getElementById('navbar').style.display = 'flex';
+            document.getElementById('login').classList.remove('active');
+            document.getElementById('juego').classList.add('active');
+            renderizar();
         }
 
-        function actualizarUI() {
-            document.getElementById('stat-tokens').innerText = jugador.tokens;
-            document.getElementById('stat-parcelas').innerText = jugador.parcelas.length;
-            renderParcelas();
+        function showPage(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
         }
 
-        function login() { document.getElementById('navbar').style.display = 'flex'; showPage('juego'); }
-        function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-        function logout() { document.getElementById('navbar').style.display = 'none'; showPage('login'); }
-
-        // Carga inicial
-        lucide.createIcons();
-        renderParcelas();
+        // Inicialización
+        if (typeof lucide !== 'undefined') lucide.createIcons();
     </script>
 </body>
 </html>
