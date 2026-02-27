@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">Micropolis - Inicio</title>
+    <title id="page-title">Micropolis - Login</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root { --primary: #3b82f6; --bg: #f8fafc; --text: #1e293b; }
@@ -80,9 +80,24 @@
     </div>
 
     <script>
-        // ... (Tu objeto COSTOS se mantiene igual)
-        const COSTOS = { 'Residencial': { tokens: 500, granos: 100, madera: 100, metales: 100 }, 'Ind. Granos': { tokens: 600, granos: 0, madera: 150, metales: 150 }, 'Ind. Algodón': { tokens: 600, granos: 150, madera: 150, metales: 0 }, 'Ind. Madera': { tokens: 600, granos: 150, madera: 0, metales: 150 }, 'Ind. Metalúrgica': { tokens: 600, granos: 150, madera: 150, metales: 0 }, 'Comercial': { tokens: 800, granos: 50, madera: 50, metales: 50 }, 'Salud': { tokens: 1000, granos: 200, madera: 200, metales: 200 }, 'Seguridad': { tokens: 1000, granos: 200, madera: 200, metales: 200 }, 'Educación': { tokens: 1000, granos: 200, madera: 200, metales: 200 } };
-        const ofertas = [ { id: 1, tipo: 'granos', cantidad: 50, precio: 40 }, { id: 2, tipo: 'madera', cantidad: 30, precio: 25 }, { id: 3, tipo: 'metales', cantidad: 20, precio: 50 }, { id: 4, tipo: 'algodon', cantidad: 40, precio: 30 } ];
+        const COSTOS = {
+            'Residencial': { tokens: 500, granos: 100, madera: 100, metales: 100 },
+            'Ind. Granos': { tokens: 600, granos: 0, madera: 150, metales: 150 },
+            'Ind. Algodón': { tokens: 600, granos: 150, madera: 150, metales: 0 },
+            'Ind. Madera': { tokens: 600, granos: 150, madera: 0, metales: 150 },
+            'Ind. Metalúrgica': { tokens: 600, granos: 150, madera: 150, metales: 0 },
+            'Comercial': { tokens: 800, granos: 50, madera: 50, metales: 50 },
+            'Salud': { tokens: 1000, granos: 200, madera: 200, metales: 200 },
+            'Seguridad': { tokens: 1000, granos: 200, madera: 200, metales: 200 },
+            'Educación': { tokens: 1000, granos: 200, madera: 200, metales: 200 }
+        };
+
+        const ofertas = [
+            { id: 1, tipo: 'granos', cantidad: 50, precio: 40 },
+            { id: 2, tipo: 'madera', cantidad: 30, precio: 25 },
+            { id: 3, tipo: 'metales', cantidad: 20, precio: 50 },
+            { id: 4, tipo: 'algodon', cantidad: 40, precio: 30 }
+        ];
 
         let jugador = null;
         let currentUser = "";
@@ -93,10 +108,7 @@
             const name = document.getElementById('username').value.trim();
             if (!name) return alert("Por favor ingresa un nombre");
             currentUser = name;
-            
-            // Actualizar título de pestaña
             document.getElementById('page-title').innerText = `Micropolis - ${currentUser}`;
-            
             const saved = localStorage.getItem(`micropolis_${currentUser}`);
             if (saved) {
                 jugador = JSON.parse(saved);
@@ -109,9 +121,6 @@
             showPage('juego');
         }
 
-        // ... (Mantén tus funciones pasarCiclo, vender, comprarOferta, mejorarParcela, actualizarUI, etc., iguales)
-        // [Las funciones de lógica siguen siendo las mismas de tu versión anterior, solo asegúrate de pegarlas aquí]
-        
         function pasarCiclo() {
             jugador.ciclo++;
             jugador.parcelas.forEach(p => {
@@ -121,28 +130,41 @@
                 if(p.tipo.includes('Madera')) jugador.inventario.madera += Math.floor((20) * mult);
                 if(p.tipo.includes('Metal')) jugador.inventario.metales += Math.floor((20) * mult);
             });
-            ['granos', 'metales', 'algodon', 'madera'].forEach(tipo => { if(jugador.inventario[tipo] > 100) { let venta = Math.floor(jugador.inventario[tipo] * 0.4); jugador.inventario[tipo] -= venta; jugador.tokens += (venta * 2); } });
-            guardarJuego(); actualizarUI();
+            ['granos', 'metales', 'algodon', 'madera'].forEach(tipo => {
+                if(jugador.inventario[tipo] > 100) {
+                    let venta = Math.floor(jugador.inventario[tipo] * 0.4);
+                    jugador.inventario[tipo] -= venta;
+                    jugador.tokens += (venta * 2);
+                }
+            });
+            guardarJuego();
+            actualizarUI();
         }
-
-        function vender(tipo) { let cantidad = parseInt(document.getElementById(`input-${tipo}`).value); if(cantidad > 0 && cantidad <= jugador.inventario[tipo]) { jugador.inventario[tipo] -= cantidad; jugador.tokens += cantidad; guardarJuego(); actualizarUI(); } else { alert("Cantidad inválida o insuficiente stock"); } }
-        function comprarOferta(id) { let oferta = ofertas.find(o => o.id === id); if(jugador.tokens >= oferta.precio) { jugador.tokens -= oferta.precio; jugador.inventario[oferta.tipo] += oferta.cantidad; guardarJuego(); actualizarUI(); } else { alert("No tienes suficientes Tokens"); } }
-        function mejorarParcela(index) { let p = jugador.parcelas[index]; let c = COSTOS[p.tipo]; let factor = (p.nivel + 1); if (jugador.tokens >= (c.tokens * factor) && jugador.inventario.granos >= (c.granos * factor) && jugador.inventario.madera >= (c.madera * factor) && jugador.inventario.metales >= (c.metales * factor)) { jugador.tokens -= (c.tokens * factor); jugador.inventario.granos -= (c.granos * factor); jugador.inventario.madera -= (c.madera * factor); jugador.inventario.metales -= (c.metales * factor); p.nivel++; guardarJuego(); actualizarUI(); } else { alert("Recursos insuficientes"); } }
-        function demoler(index) { if (jugador.tokens >= 100) { jugador.tokens -= 100; jugador.parcelas[index] = { id: jugador.parcelas[index].id, tipo: 'Vacia', nivel: 0 }; guardarJuego(); actualizarUI(); } else { alert("Necesitas 100 tokens"); } }
-        function construir(index, tipo) { if(tipo !== 'Vacia') { jugador.parcelas[index].tipo = tipo; guardarJuego(); actualizarUI(); } }
-        function comprarParcelas() { jugador.tokens -= 50; jugador.parcelas.push({id: Date.now(), tipo: 'Vacia', nivel: 0}, {id: Date.now()+1, tipo: 'Vacia', nivel: 0}); guardarJuego(); actualizarUI(); }
-        function logout() { currentUser = ""; document.getElementById('navbar').style.display = 'none'; showPage('login'); }
-        function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); if(id !== 'login') actualizarUI(); }
 
         function renderParcelas() {
             const container = document.getElementById('grid-parcelas');
             container.innerHTML = '';
             jugador.parcelas.forEach((p, index) => {
-                const div = document.createElement('div'); div.className = 'parcela-card';
+                const div = document.createElement('div');
+                div.className = 'parcela-card';
                 if (p.tipo === 'Vacia') {
-                    div.innerHTML = `<p><strong>Vacia</strong></p><select onchange="construir(${index}, this.value)"><option value="Vacia">Elegir...</option><option value="Residencial">Residencial</option><option value="Ind. Granos">Ind. Granos</option><option value="Ind. Algodón">Ind. Algodón</option><option value="Ind. Madera">Ind. Madera</option><option value="Ind. Metalúrgica">Ind. Metalúrgica</option><option value="Comercial">Comercial</option><option value="Salud">Salud</option><option value="Seguridad">Seguridad</option><option value="Educación">Educación</option></select>`;
+                    div.innerHTML = `<p><strong>Vacia</strong></p>
+                    <select onchange="construir(${index}, this.value)">
+                        <option value="Vacia">Elegir...</option>
+                        <option value="Residencial">Residencial</option>
+                        <option value="Ind. Granos">Ind. Granos</option>
+                        <option value="Ind. Algodón">Ind. Algodón</option>
+                        <option value="Ind. Madera">Ind. Madera</option>
+                        <option value="Ind. Metalúrgica">Ind. Metalúrgica</option>
+                        <option value="Comercial">Comercial</option>
+                        <option value="Salud">Salud</option>
+                        <option value="Seguridad">Seguridad</option>
+                        <option value="Educación">Educación</option>
+                    </select>`;
                 } else {
-                    div.innerHTML = `<p><strong>${p.tipo}</strong></p><small>Niv: ${p.nivel}</small><button class="btn-accion" onclick="mejorarParcela(${index})">Upgrade (Niv ${p.nivel+1})</button><button class="btn-accion btn-demoler" onclick="demoler(${index})">Demoler (100 T)</button>`;
+                    div.innerHTML = `<p><strong>${p.tipo}</strong></p><small>Niv: ${p.nivel}</small>
+                    <button class="btn-accion" onclick="mejorarParcela(${index})">Upgrade (Niv ${p.nivel+1})</button>
+                    <button class="btn-accion btn-demoler" onclick="demoler(${index})">Demoler (100 T)</button>`;
                 }
                 container.appendChild(div);
             });
@@ -151,15 +173,55 @@
         function actualizarUI() {
             if (!jugador) return;
             const inv = jugador.inventario;
+            const hab = jugador.parcelas.filter(p => p.tipo === 'Residencial').reduce((acc, p) => acc + (100 + (p.nivel * 50)), 0);
+            const salud = Math.min(jugador.parcelas.filter(p => p.tipo === 'Salud').reduce((acc, p) => acc + (25 + (p.nivel * 10)), 0), 100);
+            const seg = Math.min(jugador.parcelas.filter(p => p.tipo === 'Seguridad').reduce((acc, p) => acc + (25 + (p.nivel * 10)), 0), 100);
+            const edu = Math.min(jugador.parcelas.filter(p => p.tipo === 'Educación').reduce((acc, p) => acc + (25 + (p.nivel * 10)), 0), 100);
+
             document.getElementById('token-display').innerText = `${jugador.tokens} Tokens`;
             document.getElementById('ciclo-display').innerText = jugador.ciclo;
-            document.getElementById('stats-grid').innerHTML = `<div class="stat-card"><small>Granos</small><p>${inv.granos}</p></div><div class="stat-card"><small>Metales</small><p>${inv.metales}</p></div><div class="stat-card"><small>Algodón</small><p>${inv.algodon}</p></div><div class="stat-card"><small>Madera</small><p>${inv.madera}</p></div>`;
+            
+            document.getElementById('stats-grid').innerHTML = `
+                <div class="stat-card"><small>Granos</small><p>${inv.granos}</p></div>
+                <div class="stat-card"><small>Metales</small><p>${inv.metales}</p></div>
+                <div class="stat-card"><small>Algodón</small><p>${inv.algodon}</p></div>
+                <div class="stat-card"><small>Madera</small><p>${inv.madera}</p></div>
+                <div class="stat-card"><small>Habitantes</small><p>${hab}</p></div>
+                <div class="stat-card"><small>Salud</small><p>${salud}%</p></div>
+                <div class="stat-card"><small>Segur.</small><p>${seg}%</p></div>
+                <div class="stat-card"><small>Edu.</small><p>${edu}%</p></div>
+            `;
+            
             document.getElementById('inventario-lista').innerHTML = `<li>Granos: ${inv.granos} | Metales: ${inv.metales} | Algodón: ${inv.algodon} | Madera: ${inv.madera}</li>`;
-            document.getElementById('venta-controles').innerHTML = Object.keys(inv).map(tipo => `<div style="margin-bottom: 10px;"><p>${tipo.toUpperCase()}: <strong>${inv[tipo]}</strong> en stock</p><input type="number" id="input-${tipo}" placeholder="Cantidad"><button class="btn-accion" style="width: auto; background: #64748b;" onclick="vender('${tipo}')">Vender</button></div>`).join('');
-            document.getElementById('ofertas-lista').innerHTML = ofertas.map(o => `<div class="parcela-card" style="margin-bottom: 10px;"><p>${o.cantidad} de <strong>${o.tipo}</strong> por ${o.precio} TK</p><button class="btn-accion" onclick="comprarOferta(${o.id})">Comprar</button></div>`).join('');
-            renderParcelas(); lucide.createIcons();
+            
+            document.getElementById('venta-controles').innerHTML = Object.keys(inv).map(tipo => `
+                <div style="margin-bottom: 10px;">
+                    <p>${tipo.toUpperCase()}: <strong>${inv[tipo]}</strong> en stock</p>
+                    <input type="number" id="input-${tipo}" placeholder="Cantidad">
+                    <button class="btn-accion" style="width: auto; background: #64748b;" onclick="vender('${tipo}')">Vender</button>
+                </div>
+            `).join('');
+
+            document.getElementById('ofertas-lista').innerHTML = ofertas.map(o => `
+                <div class="parcela-card" style="margin-bottom: 10px;">
+                    <p>${o.cantidad} de <strong>${o.tipo}</strong> por ${o.precio} TK</p>
+                    <button class="btn-accion" onclick="comprarOferta(${o.id})">Comprar</button>
+                </div>
+            `).join('');
+
+            renderParcelas();
+            lucide.createIcons();
         }
 
+        function vender(tipo) { let cantidad = parseInt(document.getElementById(`input-${tipo}`).value); if(cantidad > 0 && cantidad <= jugador.inventario[tipo]) { jugador.inventario[tipo] -= cantidad; jugador.tokens += cantidad; guardarJuego(); actualizarUI(); } else { alert("Cantidad inválida"); } }
+        function comprarOferta(id) { let oferta = ofertas.find(o => o.id === id); if(jugador.tokens >= oferta.precio) { jugador.tokens -= oferta.precio; jugador.inventario[oferta.tipo] += oferta.cantidad; guardarJuego(); actualizarUI(); } else { alert("Tokens insuficientes"); } }
+        function mejorarParcela(index) { let p = jugador.parcelas[index]; let c = COSTOS[p.tipo]; let factor = (p.nivel + 1); if (jugador.tokens >= (c.tokens * factor) && jugador.inventario.granos >= (c.granos * factor) && jugador.inventario.madera >= (c.madera * factor) && jugador.inventario.metales >= (c.metales * factor)) { jugador.tokens -= (c.tokens * factor); jugador.inventario.granos -= (c.granos * factor); jugador.inventario.madera -= (c.madera * factor); jugador.inventario.metales -= (c.metales * factor); p.nivel++; guardarJuego(); actualizarUI(); } else { alert("Recursos insuficientes"); } }
+        function demoler(index) { if (jugador.tokens >= 100) { jugador.tokens -= 100; jugador.parcelas[index] = { id: jugador.parcelas[index].id, tipo: 'Vacia', nivel: 0 }; guardarJuego(); actualizarUI(); } else { alert("Necesitas 100 tokens"); } }
+        function construir(index, tipo) { if(tipo !== 'Vacia') { jugador.parcelas[index].tipo = tipo; guardarJuego(); actualizarUI(); } }
+        function comprarParcelas() { jugador.tokens -= 50; jugador.parcelas.push({id: Date.now(), tipo: 'Vacia', nivel: 0}, {id: Date.now()+1, tipo: 'Vacia', nivel: 0}); guardarJuego(); actualizarUI(); }
+        function logout() { currentUser = ""; document.getElementById('navbar').style.display = 'none'; showPage('login'); }
+        function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); if(id !== 'login') actualizarUI(); }
+        
         lucide.createIcons();
     </script>
 </body>
