@@ -3,25 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Micropolis - Gestión Urbana</title>
+    <title id="page-title">Micropolis - Inicio</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <style>
         :root { --primary: #3b82f6; --bg: #f8fafc; --text: #1e293b; }
         body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg); color: var(--text); }
-        .page { display: none; width: 90%; max-width: 900px; margin: 20px auto; padding: 30px; background: white; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .page { display: none; width: 95%; max-width: 1000px; margin: 20px auto; padding: 20px; background: white; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
         .active { display: block; }
-        
         nav { background: #1e293b; color: white; padding: 15px; display: flex; justify-content: center; gap: 20px; position: sticky; top: 0; z-index: 100; }
         nav button { background: transparent; border: none; color: #94a3b8; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 0.8rem; transition: 0.3s; }
         nav button:hover, nav button.active-nav { color: white; }
-
-        .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 20px; }
-        .stat-card { background: #f1f5f9; padding: 20px; border-radius: 12px; text-align: center; }
-        .stat-card p { margin: 10px 0 0; font-size: 1.5rem; font-weight: 700; color: var(--primary); }
-
-        .grid-parcelas { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
-        .parcela-card { border: 2px solid #e2e8f0; padding: 15px; border-radius: 12px; text-align: center; background: #fff; }
-        .btn-accion { margin-top: 10px; padding: 8px 16px; border: none; border-radius: 6px; background: var(--primary); color: white; cursor: pointer; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(110px, 1fr)); gap: 8px; margin-bottom: 20px; }
+        .stat-card { background: #f1f5f9; padding: 10px; border-radius: 8px; text-align: center; }
+        .stat-card p { margin: 5px 0 0; font-size: 1rem; font-weight: 700; color: var(--primary); }
+        .stat-card small { font-size: 0.7rem; color: #64748b; }
+        .grid-parcelas { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; }
+        .parcela-card { border: 2px solid #e2e8f0; padding: 15px; border-radius: 12px; background: #fff; text-align: center; }
+        .btn-accion { margin-top: 8px; padding: 6px 12px; border: none; border-radius: 6px; background: var(--primary); color: white; cursor: pointer; width: 100%; font-size: 0.9rem; }
+        .btn-demoler { background: #ef4444; }
+        select { width: 100%; padding: 6px; margin: 8px 0; border-radius: 6px; border: 1px solid #cbd5e1; }
+        input[type="text"], input[type="number"] { width: 100%; padding: 8px; margin: 8px 0; border: 1px solid #cbd5e1; border-radius: 6px; box-sizing: border-box; }
+        .mercado-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
     </style>
 </head>
 <body>
@@ -36,111 +38,129 @@
     <div id="login" class="page active" style="text-align: center;">
         <i data-lucide="building-2" style="width: 64px; height: 64px; color: var(--primary);"></i>
         <h1>Micropolis</h1>
-        <button class="btn-accion" onclick="login()">Entrar al Juego</button>
+        <input type="text" id="username" placeholder="Ingresa tu nombre de usuario" style="max-width: 300px; text-align: center;">
+        <br>
+        <button class="btn-accion" style="width: auto; padding: 10px 20px;" onclick="login()">Entrar a mi Ciudad</button>
     </div>
 
     <div id="juego" class="page">
-        <h2><i data-lucide="map"></i> Tu Ciudad</h2>
-        <div class="stats-container">
-            <div class="stat-card"><h3>Tokens</h3><p id="stat-tokens">1000</p></div>
-            <div class="stat-card"><h3>Parcelas</h3><p id="stat-parcelas">4</p></div>
+        <h2><i data-lucide="map"></i> Ciudad: <span id="nombre-usuario" style="color: var(--primary);"></span></h2>
+        <p>Tokens: <span id="token-display"></span> | Ciclo: <span id="ciclo-display"></span></p>
+        <div id="stats-grid" class="stats-grid"></div>
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button onclick="pasarCiclo()" style="background: #8b5cf6;" class="btn-accion"><i data-lucide="refresh-cw"></i> Pasar Ciclo</button>
+            <button onclick="comprarParcelas()" style="background: #10b981;" class="btn-accion"><i data-lucide="plus-circle"></i> Comprar (2 Parcelas)</button>
         </div>
-        <button onclick="comprarParcelas()" style="background: #10b981;" class="btn-accion">Comprar 2 Parcelas (50 Tokens)</button>
         <div id="grid-parcelas" class="grid-parcelas"></div>
     </div>
 
     <div id="dashboard" class="page">
         <h1><i data-lucide="pie-chart"></i> Dashboard</h1>
-        <h3><i data-lucide="package"></i> Inventario</h3>
+        <h3><i data-lucide="package"></i> Inventario Detallado</h3>
         <ul id="inventario-lista" style="list-style: none; padding: 0;"></ul>
     </div>
 
     <div id="mercado" class="page">
         <h1><i data-lucide="shopping-cart"></i> Mercado</h1>
-        <p>Zona de comercio de oferta y demanda.</p>
+        <div class="mercado-grid">
+            <div>
+                <h3>Vender suministros (1 TK/u)</h3>
+                <div id="venta-controles"></div>
+            </div>
+            <div>
+                <h3>Ofertas de otros jugadores</h3>
+                <div id="ofertas-lista"></div>
+            </div>
+        </div>
     </div>
 
     <div id="configuraciones" class="page">
         <h1><i data-lucide="settings"></i> Configuraciones</h1>
-        <button onclick="logout()" class="btn-accion" style="background: #ef4444;">Cerrar Sesión</button>
+        <button onclick="logout()" class="btn-accion" style="background: #ef4444;"><i data-lucide="log-out"></i> Cerrar Sesión</button>
     </div>
 
     <script>
-        let jugador = {
-            tokens: 1000,
-            parcelas: [
-                { id: 1, tipo: 'Vacia', nivel: 0 },
-                { id: 2, tipo: 'Vacia', nivel: 0 },
-                { id: 3, tipo: 'Vacia', nivel: 0 },
-                { id: 4, tipo: 'Vacia', nivel: 0 }
-            ],
-            inventario: { granos: 0, metales: 0, algodon: 0, madera: 0 }
-        };
+        // ... (Tu objeto COSTOS se mantiene igual)
+        const COSTOS = { 'Residencial': { tokens: 500, granos: 100, madera: 100, metales: 100 }, 'Ind. Granos': { tokens: 600, granos: 0, madera: 150, metales: 150 }, 'Ind. Algodón': { tokens: 600, granos: 150, madera: 150, metales: 0 }, 'Ind. Madera': { tokens: 600, granos: 150, madera: 0, metales: 150 }, 'Ind. Metalúrgica': { tokens: 600, granos: 150, madera: 150, metales: 0 }, 'Comercial': { tokens: 800, granos: 50, madera: 50, metales: 50 }, 'Salud': { tokens: 1000, granos: 200, madera: 200, metales: 200 }, 'Seguridad': { tokens: 1000, granos: 200, madera: 200, metales: 200 }, 'Educación': { tokens: 1000, granos: 200, madera: 200, metales: 200 } };
+        const ofertas = [ { id: 1, tipo: 'granos', cantidad: 50, precio: 40 }, { id: 2, tipo: 'madera', cantidad: 30, precio: 25 }, { id: 3, tipo: 'metales', cantidad: 20, precio: 50 }, { id: 4, tipo: 'algodon', cantidad: 40, precio: 30 } ];
+
+        let jugador = null;
+        let currentUser = "";
+
+        function guardarJuego() { if (currentUser) localStorage.setItem(`micropolis_${currentUser}`, JSON.stringify(jugador)); }
+
+        function login() {
+            const name = document.getElementById('username').value.trim();
+            if (!name) return alert("Por favor ingresa un nombre");
+            currentUser = name;
+            
+            // Actualizar título de pestaña
+            document.getElementById('page-title').innerText = `Micropolis - ${currentUser}`;
+            
+            const saved = localStorage.getItem(`micropolis_${currentUser}`);
+            if (saved) {
+                jugador = JSON.parse(saved);
+            } else {
+                jugador = { tokens: 5000, ciclo: 1, parcelas: [{ id: 1, tipo: 'Vacia', nivel: 0 }, { id: 2, tipo: 'Vacia', nivel: 0 }, { id: 3, tipo: 'Vacia', nivel: 0 }, { id: 4, tipo: 'Vacia', nivel: 0 }], inventario: { granos: 500, metales: 500, algodon: 500, madera: 500 } };
+                guardarJuego();
+            }
+            document.getElementById('nombre-usuario').innerText = currentUser;
+            document.getElementById('navbar').style.display = 'flex';
+            showPage('juego');
+        }
+
+        // ... (Mantén tus funciones pasarCiclo, vender, comprarOferta, mejorarParcela, actualizarUI, etc., iguales)
+        // [Las funciones de lógica siguen siendo las mismas de tu versión anterior, solo asegúrate de pegarlas aquí]
+        
+        function pasarCiclo() {
+            jugador.ciclo++;
+            jugador.parcelas.forEach(p => {
+                let mult = 1 + (p.nivel * 0.5);
+                if(p.tipo.includes('Granos')) jugador.inventario.granos += Math.floor((20) * mult);
+                if(p.tipo.includes('Algodón')) jugador.inventario.algodon += Math.floor((20) * mult);
+                if(p.tipo.includes('Madera')) jugador.inventario.madera += Math.floor((20) * mult);
+                if(p.tipo.includes('Metal')) jugador.inventario.metales += Math.floor((20) * mult);
+            });
+            ['granos', 'metales', 'algodon', 'madera'].forEach(tipo => { if(jugador.inventario[tipo] > 100) { let venta = Math.floor(jugador.inventario[tipo] * 0.4); jugador.inventario[tipo] -= venta; jugador.tokens += (venta * 2); } });
+            guardarJuego(); actualizarUI();
+        }
+
+        function vender(tipo) { let cantidad = parseInt(document.getElementById(`input-${tipo}`).value); if(cantidad > 0 && cantidad <= jugador.inventario[tipo]) { jugador.inventario[tipo] -= cantidad; jugador.tokens += cantidad; guardarJuego(); actualizarUI(); } else { alert("Cantidad inválida o insuficiente stock"); } }
+        function comprarOferta(id) { let oferta = ofertas.find(o => o.id === id); if(jugador.tokens >= oferta.precio) { jugador.tokens -= oferta.precio; jugador.inventario[oferta.tipo] += oferta.cantidad; guardarJuego(); actualizarUI(); } else { alert("No tienes suficientes Tokens"); } }
+        function mejorarParcela(index) { let p = jugador.parcelas[index]; let c = COSTOS[p.tipo]; let factor = (p.nivel + 1); if (jugador.tokens >= (c.tokens * factor) && jugador.inventario.granos >= (c.granos * factor) && jugador.inventario.madera >= (c.madera * factor) && jugador.inventario.metales >= (c.metales * factor)) { jugador.tokens -= (c.tokens * factor); jugador.inventario.granos -= (c.granos * factor); jugador.inventario.madera -= (c.madera * factor); jugador.inventario.metales -= (c.metales * factor); p.nivel++; guardarJuego(); actualizarUI(); } else { alert("Recursos insuficientes"); } }
+        function demoler(index) { if (jugador.tokens >= 100) { jugador.tokens -= 100; jugador.parcelas[index] = { id: jugador.parcelas[index].id, tipo: 'Vacia', nivel: 0 }; guardarJuego(); actualizarUI(); } else { alert("Necesitas 100 tokens"); } }
+        function construir(index, tipo) { if(tipo !== 'Vacia') { jugador.parcelas[index].tipo = tipo; guardarJuego(); actualizarUI(); } }
+        function comprarParcelas() { jugador.tokens -= 50; jugador.parcelas.push({id: Date.now(), tipo: 'Vacia', nivel: 0}, {id: Date.now()+1, tipo: 'Vacia', nivel: 0}); guardarJuego(); actualizarUI(); }
+        function logout() { currentUser = ""; document.getElementById('navbar').style.display = 'none'; showPage('login'); }
+        function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); if(id !== 'login') actualizarUI(); }
 
         function renderParcelas() {
             const container = document.getElementById('grid-parcelas');
             container.innerHTML = '';
             jugador.parcelas.forEach((p, index) => {
-                const div = document.createElement('div');
-                div.className = 'parcela-card';
-                div.innerHTML = `
-                    <i data-lucide="square"></i>
-                    <p>${p.tipo}</p>
-                    <small>Nivel: ${p.nivel}</small>
-                    <br>
-                    <button class="btn-accion" onclick="mejorarParcela(${index})">Upgrade</button>
-                `;
+                const div = document.createElement('div'); div.className = 'parcela-card';
+                if (p.tipo === 'Vacia') {
+                    div.innerHTML = `<p><strong>Vacia</strong></p><select onchange="construir(${index}, this.value)"><option value="Vacia">Elegir...</option><option value="Residencial">Residencial</option><option value="Ind. Granos">Ind. Granos</option><option value="Ind. Algodón">Ind. Algodón</option><option value="Ind. Madera">Ind. Madera</option><option value="Ind. Metalúrgica">Ind. Metalúrgica</option><option value="Comercial">Comercial</option><option value="Salud">Salud</option><option value="Seguridad">Seguridad</option><option value="Educación">Educación</option></select>`;
+                } else {
+                    div.innerHTML = `<p><strong>${p.tipo}</strong></p><small>Niv: ${p.nivel}</small><button class="btn-accion" onclick="mejorarParcela(${index})">Upgrade (Niv ${p.nivel+1})</button><button class="btn-accion btn-demoler" onclick="demoler(${index})">Demoler (100 T)</button>`;
+                }
                 container.appendChild(div);
             });
         }
 
         function actualizarUI() {
-            document.getElementById('stat-tokens').innerText = jugador.tokens;
-            document.getElementById('stat-parcelas').innerText = jugador.parcelas.length;
-            
+            if (!jugador) return;
             const inv = jugador.inventario;
-            document.getElementById('inventario-lista').innerHTML = `
-                <li>Granos: ${inv.granos}</li>
-                <li>Metales: ${inv.metales}</li>
-                <li>Algodón: ${inv.algodon}</li>
-                <li>Madera: ${inv.madera}</li>
-            `;
-            renderParcelas();
-            lucide.createIcons();
+            document.getElementById('token-display').innerText = `${jugador.tokens} Tokens`;
+            document.getElementById('ciclo-display').innerText = jugador.ciclo;
+            document.getElementById('stats-grid').innerHTML = `<div class="stat-card"><small>Granos</small><p>${inv.granos}</p></div><div class="stat-card"><small>Metales</small><p>${inv.metales}</p></div><div class="stat-card"><small>Algodón</small><p>${inv.algodon}</p></div><div class="stat-card"><small>Madera</small><p>${inv.madera}</p></div>`;
+            document.getElementById('inventario-lista').innerHTML = `<li>Granos: ${inv.granos} | Metales: ${inv.metales} | Algodón: ${inv.algodon} | Madera: ${inv.madera}</li>`;
+            document.getElementById('venta-controles').innerHTML = Object.keys(inv).map(tipo => `<div style="margin-bottom: 10px;"><p>${tipo.toUpperCase()}: <strong>${inv[tipo]}</strong> en stock</p><input type="number" id="input-${tipo}" placeholder="Cantidad"><button class="btn-accion" style="width: auto; background: #64748b;" onclick="vender('${tipo}')">Vender</button></div>`).join('');
+            document.getElementById('ofertas-lista').innerHTML = ofertas.map(o => `<div class="parcela-card" style="margin-bottom: 10px;"><p>${o.cantidad} de <strong>${o.tipo}</strong> por ${o.precio} TK</p><button class="btn-accion" onclick="comprarOferta(${o.id})">Comprar</button></div>`).join('');
+            renderParcelas(); lucide.createIcons();
         }
 
-        function comprarParcelas() {
-            if(jugador.tokens >= 50) {
-                jugador.tokens -= 50;
-                jugador.parcelas.push({id: jugador.parcelas.length + 1, tipo: 'Vacia', nivel: 0}, {id: jugador.parcelas.length + 2, tipo: 'Vacia', nivel: 0});
-                actualizarUI();
-            } else { alert("Tokens insuficientes"); }
-        }
-
-        function mejorarParcela(index) {
-            jugador.parcelas[index].nivel++;
-            actualizarUI();
-        }
-
-        function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
-            document.getElementById(pageId).classList.add('active');
-            actualizarUI();
-        }
-
-        function login() {
-            document.getElementById('navbar').style.display = 'flex';
-            showPage('juego');
-        }
-
-        function logout() {
-            document.getElementById('navbar').style.display = 'none';
-            showPage('login');
-        }
-
-        // Inicialización
         lucide.createIcons();
-        actualizarUI();
     </script>
 </body>
 </html>
