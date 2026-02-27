@@ -51,12 +51,13 @@
 
     <div id="dashboard" class="page">
         <h1><i data-lucide="pie-chart"></i> Dashboard</h1>
-        <p>Estadísticas y recursos.</p>
+        <h3><i data-lucide="package"></i> Inventario</h3>
+        <ul id="inventario-lista" style="list-style: none; padding: 0;"></ul>
     </div>
 
     <div id="mercado" class="page">
         <h1><i data-lucide="shopping-cart"></i> Mercado</h1>
-        <p>Zona de oferta y demanda.</p>
+        <p>Zona de comercio de oferta y demanda.</p>
     </div>
 
     <div id="configuraciones" class="page">
@@ -72,7 +73,8 @@
                 { id: 2, tipo: 'Vacia', nivel: 0 },
                 { id: 3, tipo: 'Vacia', nivel: 0 },
                 { id: 4, tipo: 'Vacia', nivel: 0 }
-            ]
+            ],
+            inventario: { granos: 0, metales: 0, algodon: 0, madera: 0 }
         };
 
         function renderParcelas() {
@@ -90,27 +92,40 @@
                 `;
                 container.appendChild(div);
             });
-            lucide.createIcons();
+        }
+
+        function actualizarUI() {
             document.getElementById('stat-tokens').innerText = jugador.tokens;
             document.getElementById('stat-parcelas').innerText = jugador.parcelas.length;
+            
+            const inv = jugador.inventario;
+            document.getElementById('inventario-lista').innerHTML = `
+                <li>Granos: ${inv.granos}</li>
+                <li>Metales: ${inv.metales}</li>
+                <li>Algodón: ${inv.algodon}</li>
+                <li>Madera: ${inv.madera}</li>
+            `;
+            renderParcelas();
+            lucide.createIcons();
         }
 
         function comprarParcelas() {
             if(jugador.tokens >= 50) {
                 jugador.tokens -= 50;
                 jugador.parcelas.push({id: jugador.parcelas.length + 1, tipo: 'Vacia', nivel: 0}, {id: jugador.parcelas.length + 2, tipo: 'Vacia', nivel: 0});
-                renderParcelas();
+                actualizarUI();
             } else { alert("Tokens insuficientes"); }
         }
 
         function mejorarParcela(index) {
             jugador.parcelas[index].nivel++;
-            renderParcelas();
+            actualizarUI();
         }
 
         function showPage(pageId) {
             document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
+            actualizarUI();
         }
 
         function login() {
@@ -123,8 +138,9 @@
             showPage('login');
         }
 
+        // Inicialización
         lucide.createIcons();
-        renderParcelas();
+        actualizarUI();
     </script>
 </body>
 </html>
