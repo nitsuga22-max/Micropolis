@@ -3,57 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Micropolis</title>
+    <title>Micropolis - Gestión Urbana</title>
     <style>
-        body { font-family: sans-serif; margin: 0; padding: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; background-color: #f0f0f0; }
-        .page { display: none; width: 100%; max-width: 600px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background-color: #e0e5eb; }
+        .page { display: none; width: 90%; max-width: 800px; margin: 20px auto; padding: 20px; background: white; border-radius: 12px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .active { display: block; }
-        nav { margin-bottom: 20px; }
-        button { margin: 5px; padding: 10px; cursor: pointer; }
+        nav { background: #333; color: white; padding: 15px; display: flex; justify-content: center; gap: 10px; }
+        button { padding: 10px 15px; cursor: pointer; border: none; border-radius: 5px; background: #5c67f2; color: white; }
+        button:hover { background: #4a54e1; }
+        .stat-card { border: 1px solid #ddd; padding: 15px; border-radius: 8px; margin: 10px 0; }
     </style>
 </head>
 <body>
 
     <nav id="navbar" style="display: none;">
-        <button onclick="showPage('login')">Login</button>
-        <button onclick="showPage('juego')">Juego</button>
+        <button onclick="showPage('juego')">Ciudad</button>
         <button onclick="showPage('dashboard')">Dashboard</button>
         <button onclick="showPage('mercado')">Mercado</button>
-        <button onclick="showPage('configuraciones')">Configuraciones</button>
+        <button onclick="showPage('configuraciones')">Config</button>
     </nav>
 
     <div id="login" class="page active">
-        <h1>Micropolis - Login</h1>
-        <input type="text" placeholder="Usuario">
-        <button onclick="showPage('juego'); document.getElementById('navbar').style.display='block';">Entrar</button>
+        <h1>Bienvenido a Micropolis</h1>
+        <p>Inicia sesión para gestionar tu parcela.</p>
+        <button onclick="login()">Entrar al Juego</button>
     </div>
 
     <div id="juego" class="page">
-        <h1>Juego</h1>
-        <p>Bienvenido a la ciudad.</p>
+        <h1>Tu Parcela</h1>
+        <div id="parcela-status">Construcción principal: Ninguna</div>
     </div>
 
     <div id="dashboard" class="page">
-        <h1>Dashboard</h1>
-        <p>Estadísticas de tu ciudad.</p>
+        <h1>Dashboard Económico</h1>
+        <div class="stat-card">
+            <h3>Recursos</h3>
+            <p>Tokens: <span id="tokens">1000</span></p>
+            <p>Población: <span id="poblacion">0</span></p>
+        </div>
     </div>
 
     <div id="mercado" class="page">
         <h1>Mercado de Oferta y Demanda</h1>
-        <p>Comercio local.</p>
+        <p>Intercambia suministros con otros jugadores.</p>
     </div>
 
     <div id="configuraciones" class="page">
         <h1>Configuraciones</h1>
-        <p>Ajustes del juego.</p>
+        <button onclick="logout()">Cerrar Sesión</button>
     </div>
 
     <script>
         function showPage(pageId) {
-            document.querySelectorAll('.page').forEach(page => {
-                page.classList.remove('active');
-            });
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
             document.getElementById(pageId).classList.add('active');
+        }
+
+        function login() {
+            document.getElementById('navbar').style.display = 'flex';
+            showPage('juego');
+        }
+
+        function logout() {
+            document.getElementById('navbar').style.display = 'none';
+            showPage('login');
         }
     </script>
 </body>
