@@ -10,15 +10,18 @@
         body { font-family: 'Inter', sans-serif; margin: 0; background-color: var(--bg); color: var(--text); }
         .page { display: none; width: 90%; max-width: 900px; margin: 20px auto; padding: 30px; background: white; border-radius: 16px; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
         .active { display: block; }
+        
         nav { background: #1e293b; color: white; padding: 15px; display: flex; justify-content: center; gap: 20px; position: sticky; top: 0; z-index: 100; }
         nav button { background: transparent; border: none; color: #94a3b8; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 5px; font-size: 0.8rem; transition: 0.3s; }
         nav button:hover, nav button.active-nav { color: white; }
+
         .stats-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 15px; margin-bottom: 20px; }
         .stat-card { background: #f1f5f9; padding: 20px; border-radius: 12px; text-align: center; }
         .stat-card p { margin: 10px 0 0; font-size: 1.5rem; font-weight: 700; color: var(--primary); }
-        .grid-parcelas { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-top: 20px; }
+
+        .grid-parcelas { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-top: 20px; }
         .parcela-card { border: 2px solid #e2e8f0; padding: 15px; border-radius: 12px; text-align: center; background: #fff; }
-        .btn-accion { margin-top: 10px; padding: 8px; border: none; border-radius: 6px; background: var(--primary); color: white; cursor: pointer; }
+        .btn-accion { margin-top: 10px; padding: 8px 16px; border: none; border-radius: 6px; background: var(--primary); color: white; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -42,23 +45,13 @@
             <div class="stat-card"><h3>Tokens</h3><p id="stat-tokens">1000</p></div>
             <div class="stat-card"><h3>Parcelas</h3><p id="stat-parcelas">4</p></div>
         </div>
-        <button onclick="comprarParcelas()" style="background: #10b981;" class="btn-accion">Comprar 2 Parcelas (Costo variable)</button>
+        <button onclick="comprarParcelas()" style="background: #10b981;" class="btn-accion">Comprar 2 Parcelas (50 Tokens)</button>
         <div id="grid-parcelas" class="grid-parcelas"></div>
     </div>
 
-    <div id="dashboard" class="page">
-        <h1>Dashboard</h1>
-        <div id="inventario-lista"></div>
-    </div>
-
-    <div id="mercado" class="page">
-        <h1>Mercado</h1>
-    </div>
-
-    <div id="configuraciones" class="page">
-        <h1>Configuraciones</h1>
-        <button onclick="logout()" class="btn-accion" style="background: #ef4444;">Cerrar Sesión</button>
-    </div>
+    <div id="dashboard" class="page"><h1>Dashboard</h1></div>
+    <div id="mercado" class="page"><h1>Mercado</h1></div>
+    <div id="configuraciones" class="page"><h1>Configuraciones</h1><button onclick="logout()" class="btn-accion" style="background: #ef4444;">Cerrar Sesión</button></div>
 
     <script>
         let jugador = {
@@ -86,16 +79,15 @@
                 `;
                 container.appendChild(div);
             });
-            lucide.createIcons();
-            document.getElementById('stat-parcelas').innerText = jugador.parcelas.length;
+            lucide.createIcons(); // Vital: esto renderiza los iconos
         }
 
         function comprarParcelas() {
-            if(jugador.tokens >= 50) { // Ejemplo de costo
+            if(jugador.tokens >= 50) {
                 jugador.tokens -= 50;
                 jugador.parcelas.push({id: jugador.parcelas.length + 1, tipo: 'Vacia', nivel: 0}, {id: jugador.parcelas.length + 2, tipo: 'Vacia', nivel: 0});
                 actualizarUI();
-            } else { alert("No tienes suficientes tokens"); }
+            } else { alert("Tokens insuficientes"); }
         }
 
         function mejorarParcela(index) {
@@ -105,14 +97,15 @@
 
         function actualizarUI() {
             document.getElementById('stat-tokens').innerText = jugador.tokens;
+            document.getElementById('stat-parcelas').innerText = jugador.parcelas.length;
             renderParcelas();
-            lucide.createIcons();
         }
 
         function login() { document.getElementById('navbar').style.display = 'flex'; showPage('juego'); }
         function showPage(id) { document.querySelectorAll('.page').forEach(p => p.classList.remove('active')); document.getElementById(id).classList.add('active'); }
         function logout() { document.getElementById('navbar').style.display = 'none'; showPage('login'); }
 
+        // Carga inicial
         lucide.createIcons();
         renderParcelas();
     </script>
